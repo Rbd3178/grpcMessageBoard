@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "github.com/Rbd3178/grpcMessageBoard";
+
+package messageBoard;
+
+service MessageBoard {
+  rpc PostMessage(Message) returns (Message) {}
+  rpc GetLatestMessages(GetLatestRequest) returns (stream Message) {}
+}
+
+message Message {
+    int32 id = 1;
+    string author = 2;
+    string title = 3;
+    string body = 4;
+}
+
+message GetLatestRequest {  
+    int32 amount = 1;
+}
