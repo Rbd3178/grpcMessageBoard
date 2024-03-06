@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"sync"
+	"fmt"
 
 	pb "github.com/Rbd3178/grpcMessageBoard/messageBoard"
 	"google.golang.org/grpc"
@@ -28,36 +29,38 @@ func (s *messageBoardServer) PostMessage(c context.Context, m *pb.Message) (*pb.
 	defer s.mu.Unlock()
 
 	if len(s.messages) >= s.maxSize {
-		s.messages = s.messages[1:]	
+		s.messages = s.messages[1:]
 	}
 	s.messages = append(s.messages, m)
-    return m, nil
+	return m, nil
 }
 
 func (s *messageBoardServer) GetLatestMessages(r *pb.GetLatestRequest, stream pb.MessageBoard_GetLatestMessagesServer) error {
-    s.mu.RLock()
-    defer s.mu.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	count := len(s.messages)
-    start := count - int(r.Amount)
-    if start < 0 {
-        start = 0
-    }
+	start := count - int(r.Amount)
+	if start < 0 {
+		start = 0
+	}
 
-    for _, message := range s.messages[start:] {
+	for _, message := range s.messages[start:] {
 		err := stream.Send(message)
-        if err != nil {
-            return err
-        }
-    }
+		if err != nil {
+			return err
+		}
+	}
 
-    return nil
+	return nil
 }
 
+const port = 8090
+
 func main() {
-	lis, err := net.Listen("tcp", ":8090")
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 	if err != nil {
-		log.Fatalf("Failed to listen on port 8090: %v", err)
+		log.Fatalf("Failed to listen on port %d: %v", port, err)
 	}
 
 	grpcServer := grpc.NewServer()
@@ -65,6 +68,6 @@ func main() {
 
 	err = grpcServer.Serve(lis)
 	if err != nil {
-		log.Fatalf("Failed to serve on port 8090: %v", err)
+		log.Fatalf("Failed to serve on port %d: %v", port, err)
 	}
 }
