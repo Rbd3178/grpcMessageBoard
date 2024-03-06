@@ -23,10 +23,14 @@ func newServer(maxSize int) *messageBoardServer {
 }
 
 func (s *messageBoardServer) PostMessage(c context.Context, m *pb.Message) (*pb.Message, error) {
-	m.Id = s.messages[len(s.messages)-1].Id + 1
-
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	if len(s.messages) == 0 {
+		m.Id = 1
+	} else {
+		m.Id = s.messages[len(s.messages)-1].Id + 1
+	}
 
 	if len(s.messages) >= s.maxSize {
 		s.messages = s.messages[1:]
