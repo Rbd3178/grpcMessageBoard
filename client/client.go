@@ -24,6 +24,7 @@ func main() {
 		log.Fatalf("Error reading input: %v", err)
 	}
 	address = strings.TrimSuffix(address, "\n")
+	address = strings.TrimSuffix(address, "\r")
 	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to dial: %v", err)
@@ -76,15 +77,19 @@ func main() {
 			if err != nil {
 				log.Fatalf("Error reading input: %v", err)
 			}
+			title = strings.TrimSuffix(title, "\n")
+			title = strings.TrimSuffix(title, "\r")
 			fmt.Print("Enter message: ")
 			body, err := reader.ReadString('\n')
 			if err != nil {
 				log.Fatalf("Error reading input: %v", err)
 			}
+			body = strings.TrimSuffix(body, "\n")
+			body = strings.TrimSuffix(body, "\r")
 			message := pb.Message{
 				Author: name,
-				Title:  strings.TrimSuffix(title, "\n"),
-				Body:   strings.TrimSuffix(body, "\n"),
+				Title:  title,
+				Body:   body,
 			}
 			response, err := client.PostMessage(context.Background(), &message)
 			if err != nil {
