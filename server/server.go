@@ -36,6 +36,7 @@ func (s *messageBoardServer) PostMessage(c context.Context, m *pb.Message) (*pb.
 		s.messages = s.messages[1:]
 	}
 	s.messages = append(s.messages, m)
+	log.Printf("New message. ID: %d; Author: %s; Title: %s; Body: %s;\n\n", m.Id, m.Author, m.Title, m.Body)
 	return m, nil
 }
 
