@@ -1,5 +1,5 @@
 # grpcMessageBoard
-Server and client for a simple message board.
+Server and client for a simple message board. Unary and server-streaming RPCs.
 
 ## Server
 - Stores messages with id, author name, title and body.
